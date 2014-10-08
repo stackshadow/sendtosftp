@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="servername">Servername</string>
+    <string name="keyfile">Key File</string>
+    <string name="username">username</string>
+</resources>
