@@ -17,39 +17,63 @@
 
 
 
+
+
     ]]>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imagePreview" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/serverlist"
-        android:id="@+id/serverNameText" />
-
-    <RadioGroup
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/imagePreview"
-        android:layout_below="@+id/serverNameText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/serverList"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentTop="true"
+        android:id="@+id/linearLayout2"
+        android:layout_above="@+id/connectionState">
 
-    </RadioGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/serverlist"
+            android:id="@+id/serverNameText" />
+
+        <RadioGroup
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_toEndOf="@+id/imagePreview"
+            android:layout_below="@+id/serverNameText"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/serverList"
+            android:layout_alignParentBottom="true"
+            android:gravity="top"
+            android:showDividers="beginning">
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/connection"
+        android:id="@+id/connectionState"
+        android:layout_alignParentStart="false"
+        android:layout_above="@+id/linearLayout"
+        android:checked="false"
+        android:enabled="true"
+        android:clickable="false" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/serverList"
-        android:layout_marginTop="-50dp">
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout">
 
         <Button
             android:layout_width="wrap_content"
@@ -64,12 +88,13 @@
             android:text="@string/serveredit"
             android:id="@+id/bittonEditServer" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/testconnection"
-            android:id="@+id/buttonTestConnection" />
-
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imagePreview"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

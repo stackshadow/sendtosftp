@@ -40,9 +40,11 @@ import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.jcraft.jsch.ChannelExec;
@@ -66,9 +68,10 @@ public class Main extends Activity {
     TextView        fileToSend;
     ImageView       imagePreview;
     RadioGroup      serverList;
+    Switch          connectionState;
     Button          buttonAddServer;
     Button          bittonEditServer;
-    Button          buttonTestConnection;
+
 
 // File stuff
     AssetManager    assetManager;
@@ -91,9 +94,9 @@ public class Main extends Activity {
         fileToSend=(TextView) findViewById(R.id.serverNameText);
         imagePreview=(ImageView) findViewById(R.id.imagePreview);
         serverList=(RadioGroup) findViewById(R.id.serverList);
+        connectionState=(Switch) findViewById(R.id.connectionState);
         buttonAddServer=(Button) findViewById(R.id.buttonAddServer);
         bittonEditServer=(Button) findViewById(R.id.bittonEditServer);
-        buttonTestConnection=(Button) findViewById(R.id.buttonTestConnection);
 
 
     // Other global vars
@@ -136,12 +139,17 @@ public class Main extends Activity {
                 openServerEditIntent();
             }
         });
-        buttonTestConnection.setOnClickListener( new View.OnClickListener() {
+        connectionState.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
-                testConnection();
+
+                if( connectionState.isChecked() ){
+                    connect();
+                } else {
+                    disconnect();
+                }
+
             }
         });
-
 
 
     }
@@ -207,14 +215,14 @@ public class Main extends Activity {
 
         }
     }
-    private void            testConnection(){
+    private void            connect(){
         String server = serverListGetActive();
         if( server != null ) {
             processDialog("Test Connection", "Please wait while testing the SSH Connection");
-            new testConnectionTask().execute(  conf.getServerString( server ) );
+            new connectTask().execute(  conf.getServerString( server ) );
         }
     }
-    private class           testConnectionTask extends AsyncTask<String, String, String> {
+    private class           connectTask extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... strings) {
@@ -246,13 +254,27 @@ public class Main extends Activity {
                 notificationSend("Connection Failed", "Connection to " + config.getServerHostname(jsonServer) + " failed because: " + sshConnection.errorMessage );
             }
 
-
-
-
             return null;
         }
 
 
+        protected void onPostExecute (String result){
+            if( sshConnection.isConnected() ) {
+                connectionState.setChecked(true);
+            } else {
+                connectionState.setChecked(false);
+            }
+        }
+
+
+    }
+    private void            disconnect(){
+        sshConnection.disconnect();
+        if( sshConnection.isConnected() ) {
+            connectionState.setChecked(true);
+        } else {
+            connectionState.setChecked(false);
+        }
     }
 
     @Override
