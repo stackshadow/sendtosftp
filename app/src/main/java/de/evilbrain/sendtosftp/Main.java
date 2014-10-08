@@ -229,11 +229,15 @@ public class Main extends Activity {
                 jsonServer = new JSONObject();
             }
 
-            sshConnection = new sshConnect();
-                sshConnection.setHost( config.getServerHostname(jsonServer) );
-                sshConnection.setUsername( config.getServerUsername(jsonServer) );
-                sshConnection.setPassword( config.getServerPassword(jsonServer) );
-                sshConnection.connect();
+            if( sshConnection == null ){
+                sshConnection = new sshConnect();
+            }
+
+
+            sshConnection.setHost( config.getServerHostname(jsonServer) );
+            sshConnection.setUsername( config.getServerUsername(jsonServer) );
+            sshConnection.setPassword( config.getServerPassword(jsonServer) );
+            sshConnection.connect();
 
             processDialogFinish();
             if( sshConnection.isConnected() ) {
@@ -241,6 +245,8 @@ public class Main extends Activity {
             } else {
                 notificationSend("Connection Failed", "Connection to " + config.getServerHostname(jsonServer) + " failed because: " + sshConnection.errorMessage );
             }
+
+
 
 
             return null;
@@ -301,6 +307,9 @@ public class Main extends Activity {
             jsonServer = conf.getServer( index );
         }
 
+        serverList.clearCheck();
+        serverList.bringToFront();
+
 
 
 
@@ -343,5 +352,11 @@ public class Main extends Activity {
     }
 
 
+    @Override
+    protected void          onDestroy(){
+
+    // Disconnect from ssh
+        sshConnection.disconnect();
+    }
 
 }

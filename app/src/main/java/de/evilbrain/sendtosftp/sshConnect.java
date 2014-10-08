@@ -4,6 +4,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.UserInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
@@ -17,6 +18,7 @@ public class sshConnect {
     private String      serverHostName = null;
     private String      serverUserName = null;
     private String      serverPassword = null;
+    private String      serverKeyFile = null;
     private boolean     serverIsConnected = false;
     public String       errorMessage;
 
@@ -33,16 +35,30 @@ public class sshConnect {
     public void         setPassword( String password ){
         serverPassword = password;
     }
-
+    public void         setKeyFile( String keyFIle ){
+        serverKeyFile = keyFIle;
+    }
 
     public boolean      connect(){
 
-        // TODO check if already connected
-        serverIsConnected = false;
-
+    // Connect
         try {
-            jsch = new JSch();
-            jschSession = jsch.getSession( serverUserName, serverHostName, 22);
+
+        // Create if needed
+            if( jsch == null ) jsch = new JSch();
+            if( jschSession == null ) jschSession = jsch.getSession( serverUserName, serverHostName, 22);
+
+        // Check if already connected
+            if( jschSession.isConnected() ){
+                serverIsConnected = true;
+                return true;
+            } else {
+                serverIsConnected = false;
+            }
+
+        // password authentification
+            jschSession.setHost( serverHostName );
+            jschSession.setPort(22);
             jschSession.setPassword( serverPassword );
 
         // Avoid asking for key confirmation
@@ -53,21 +69,33 @@ public class sshConnect {
         // Connect
             jschSession.connect();
 
-            serverIsConnected = true;
-
         } catch (JSchException e) {
             e.printStackTrace();
             errorMessage = e.getLocalizedMessage();
         }
 
+    // Check if connect
+        if( jschSession.isConnected() ){
+            serverIsConnected = true;
+        } else {
+            serverIsConnected = false;
+        }
+
         return serverIsConnected;
+    }
+
+    public boolean      disconnect(){
+        if( jschSession.isConnected() ) {
+            jschSession.disconnect();
+        }
+        return true;
     }
 
     public boolean      connectTest(){
         try {
             // SSH Channel
             ChannelExec channelssh = (ChannelExec)
-                    jschSession.openChannel("exec");
+            jschSession.openChannel("exec");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             channelssh.setOutputStream(baos);
 
