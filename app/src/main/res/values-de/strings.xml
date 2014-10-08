@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">SendToSFTP</string>
+    <string name="title_activity_main">SendToSFTP</string>
+    <string name="title_activity_add_server">Add/Edit Server</string>
     <string name="servername">Servername</string>
     <string name="keyfile">Key File</string>
     <string name="username">Benutzername</string>
