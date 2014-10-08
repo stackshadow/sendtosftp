@@ -39,6 +39,7 @@ public class sshConnect {
         serverKeyFile = keyFIle;
     }
 
+
     public boolean      connect(){
 
     // Connect
@@ -69,25 +70,36 @@ public class sshConnect {
         // Connect
             jschSession.connect();
 
+        // Check if connect
+            if( jschSession.isConnected() ){
+                serverIsConnected = true;
+            } else {
+                serverIsConnected = false;
+            }
+
         } catch (JSchException e) {
             e.printStackTrace();
             errorMessage = e.getLocalizedMessage();
+
+            disconnect();
         }
 
-    // Check if connect
-        if( jschSession.isConnected() ){
-            serverIsConnected = true;
-        } else {
-            serverIsConnected = false;
-        }
+
 
         return serverIsConnected;
     }
 
     public boolean      disconnect(){
+    // Basic check
+        if( jschSession == null ) return true;
+
         if( jschSession.isConnected() ) {
             jschSession.disconnect();
         }
+
+        serverIsConnected = false;
+        jschSession = null;
+
         return true;
     }
 
