@@ -4,4 +4,7 @@
     <string name="testconnection">Test Connection</string>
     <string name="addserver">Add Server</string>
     <string name="ok">ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="serveredit">Edit</string>
+    <string name="serveradd">Add</string>
 </resources>

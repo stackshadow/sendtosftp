@@ -27,12 +27,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="@string/serverlist"
         android:id="@+id/serverNameText" />
 
     <RadioGroup
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/imagePreview"
         android:layout_below="@+id/serverNameText"
         android:layout_alignParentLeft="true"
@@ -47,7 +47,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/serverList"
         android:layout_marginTop="-50dp">
 
@@ -56,13 +56,20 @@
             android:layout_height="match_parent"
             android:id="@+id/buttonAddServer"
             android:singleLine="false"
-            android:text="@string/addserver" />
+            android:text="@string/serveradd" />
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/serveredit"
+            android:id="@+id/bittonEditServer" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/testconnection"
             android:id="@+id/buttonTestConnection" />
+
     </LinearLayout>
 
 </RelativeLayout>

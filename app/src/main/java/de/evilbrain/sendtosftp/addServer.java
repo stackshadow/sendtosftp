@@ -27,12 +27,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class addServer extends Activity {
 
     // Widgets
     EditText serverName;
+    EditText serverHost;
     EditText userName;
+    EditText userPassword;
     EditText keyFile;
 
     Button buttonOK;
@@ -40,30 +45,40 @@ public class addServer extends Activity {
 
     String action;
 
-
+// Server
+    JSONObject jsonServer = null;
 
     @Override
     protected void          onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_server);
 
-        final Bundle extras = getIntent().getExtras();
-        action = extras != null ? extras.getString("action") : "nothing";
+
 
     // Get widgets
         serverName=(EditText) findViewById(R.id.serverName);
+        serverHost=(EditText) findViewById(R.id.serverHost);
         userName=(EditText) findViewById(R.id.userName);
+        userPassword=(EditText) findViewById(R.id.userPassword);
         keyFile=(EditText) findViewById(R.id.keyFile);
         buttonOK=(Button) findViewById(R.id.buttonOK);
         buttonCancel=(Button) findViewById(R.id.buttonCancel);
 
+    // Get jsonServer from intent
+        jsonServer = config.fromIntent( getIntent() );
+
+        serverName.setText( config.getServerName(jsonServer) );
+        serverHost.setText(config.getServerHostname(jsonServer));
+        userName.setText( config.getServerUsername(jsonServer) );
+        keyFile.setText( config.getServerKeyfile(jsonServer) );
 
 
-    // Actions
+        // Actions
         buttonOK.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
-                        Intent returnData = collectData();
+                        Intent returnData = new Intent();
+                        returnData.putExtra("json", collectData() );
                         setResult(RESULT_OK,returnData);
                         finish();
                     }
@@ -73,14 +88,15 @@ public class addServer extends Activity {
         ;
     }
 
-    private Intent          collectData(){
-        Intent newIntent = new Intent();
-        newIntent.putExtra( "action", action );
-        newIntent.putExtra( "serverName", serverName.getText().toString() );
-        newIntent.putExtra( "userName", userName.getText().toString() );
-        newIntent.putExtra( "keyFile", keyFile.getText().toString() );
+    private String              collectData(){
+        config.setServer( jsonServer,
+                serverName.getText().toString(),
+                serverHost.getText().toString(),
+                userName.getText().toString(),
+                userPassword.getText().toString(),
+                keyFile.getText().toString() );
 
-        return newIntent;
+        return jsonServer.toString();
     }
 
 

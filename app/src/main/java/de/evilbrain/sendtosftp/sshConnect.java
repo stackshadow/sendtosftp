@@ -18,6 +18,7 @@ public class sshConnect {
     private String      serverUserName = null;
     private String      serverPassword = null;
     private boolean     serverIsConnected = false;
+    public String       errorMessage;
 
 // JSch
     JSch                jsch = null;
@@ -36,6 +37,9 @@ public class sshConnect {
 
     public boolean      connect(){
 
+        // TODO check if already connected
+        serverIsConnected = false;
+
         try {
             jsch = new JSch();
             jschSession = jsch.getSession( serverUserName, serverHostName, 22);
@@ -51,9 +55,19 @@ public class sshConnect {
 
             serverIsConnected = true;
 
+        } catch (JSchException e) {
+            e.printStackTrace();
+            errorMessage = e.getLocalizedMessage();
+        }
+
+        return serverIsConnected;
+    }
+
+    public boolean      connectTest(){
+        try {
             // SSH Channel
             ChannelExec channelssh = (ChannelExec)
-            jschSession.openChannel("exec");
+                    jschSession.openChannel("exec");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             channelssh.setOutputStream(baos);
 
@@ -61,16 +75,19 @@ public class sshConnect {
             channelssh.setCommand("ls");
             channelssh.connect();
             channelssh.disconnect();
-
-
         } catch (JSchException e) {
             e.printStackTrace();
-            e.getLocalizedMessage();
+            errorMessage = e.getLocalizedMessage();
+            return false;
         }
 
-        return serverIsConnected;
+        return true;
     }
 
 
+
+    public boolean      isConnected(){
+        return serverIsConnected;
+    }
 
 }
