@@ -87,40 +87,18 @@ public class Main extends Activity {
         buttonAddServer=(Button) findViewById(R.id.buttonAddServer);
         buttonTestConnection=(Button) findViewById(R.id.buttonTestConnection);
 
-    // Init notifications
-        notificationInit();
-
 
     // Other global vars
         assetManager = getAssets();
         fileDir = getFilesDir();
 
-    // Create config and read it
-        conf = new config( getFilesDir(), "config.json" );
-
-    // This is for testing purpose
-        //conf.createTest();
-        //conf.configSave();
-
-        if( ! conf.configRead() ) {
-            conf.configSave();
-            if( ! conf.configRead() ) {
-                notificationSend("Error", conf.errorMessage);
-            }
-        }
-        serverListFill();
-
-
-    // Another APP send something to us
-        handlePushFromApp();
-
     // Setup actions
         buttonAddServer.setOnClickListener(
-                new View.OnClickListener() {
-                    public void onClick(View view) {
-                        openAddServerIntent();
-                    }
-                });
+        new View.OnClickListener() {
+            public void onClick(View view) {
+                openAddServerIntent();
+            }
+        });
 
         buttonTestConnection.setOnClickListener(
                 new View.OnClickListener() {
@@ -128,6 +106,22 @@ public class Main extends Activity {
                         new DownloadFilesTask().execute("host", "username", null, "keyfile");
                     }
                 });
+
+
+    // Create config and read it
+        conf = new config( getFilesDir(), "config.json" );
+
+        conf.createTest();
+        conf.configSave();
+
+        conf.configRead();
+        serverListFill();
+
+    // This Activity
+        notificationInit();
+        handlePushFromApp();
+
+        notificationSend( "Test", "This is a much longer text than notification can handle" );
 
 
 
@@ -155,19 +149,19 @@ public class Main extends Activity {
     }
     private void            notificationSend( String Title, String Text ){
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        // build notification
-        // the addAction re-use the same intent to keep the example short
-        Notification n = new Notification.Builder(this)
-                .setContentTitle(Title)
-                .setContentText(Text)
+        NotificationCompat.Builder notificationbuilder = new NotificationCompat.Builder(this);
+        Notification notification = notificationbuilder.setContentIntent(pIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pIntent)
+                .setTicker(Title)
+                .setWhen(0)
                 .setAutoCancel(true)
-                .build();
+                .setContentTitle(Title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(Text))
+                .setContentText(Text).build();
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(0, n);
+        notificationManager.notify(0, notification);
+
     }
 
     public void             openAddServerIntent(){
