@@ -87,18 +87,40 @@ public class Main extends Activity {
         buttonAddServer=(Button) findViewById(R.id.buttonAddServer);
         buttonTestConnection=(Button) findViewById(R.id.buttonTestConnection);
 
+    // Init notifications
+        notificationInit();
+
 
     // Other global vars
         assetManager = getAssets();
         fileDir = getFilesDir();
 
+    // Create config and read it
+        conf = new config( getFilesDir(), "config.json" );
+
+    // This is for testing purpose
+        //conf.createTest();
+        //conf.configSave();
+
+        if( ! conf.configRead() ) {
+            conf.configSave();
+            if( ! conf.configRead() ) {
+                notificationSend("Error", conf.errorMessage);
+            }
+        }
+        serverListFill();
+
+
+    // Another APP send something to us
+        handlePushFromApp();
+
     // Setup actions
         buttonAddServer.setOnClickListener(
-        new View.OnClickListener() {
-            public void onClick(View view) {
-                openAddServerIntent();
-            }
-        });
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+                        openAddServerIntent();
+                    }
+                });
 
         buttonTestConnection.setOnClickListener(
                 new View.OnClickListener() {
@@ -106,23 +128,6 @@ public class Main extends Activity {
                         new DownloadFilesTask().execute("host", "username", null, "keyfile");
                     }
                 });
-
-
-    // Create config and read it
-        conf = new config( getFilesDir(), "config.json" );
-
-        conf.createTest();
-        conf.configSave();
-
-        conf.configRead();
-        serverListFill();
-
-    // This Activity
-        notificationInit();
-        handlePushFromApp();
-
-
-
 
 
 
@@ -154,11 +159,12 @@ public class Main extends Activity {
         // build notification
         // the addAction re-use the same intent to keep the example short
         Notification n = new Notification.Builder(this)
-                .setContentTitle( Title )
-                .setContentText( Text )
+                .setContentTitle(Title)
+                .setContentText(Text)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent)
-                .setAutoCancel(true).build();
+                .setAutoCancel(true)
+                .build();
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(0, n);

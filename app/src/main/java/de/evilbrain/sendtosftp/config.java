@@ -20,38 +20,52 @@ import java.io.InputStreamReader;
 public class config {
 
     // Core
+    public String           errorMessage;
     private File            fileDir;
 
     // Configuration
     private String          jsonConfigFile = null;
     private JSONObject      jsonConfig = null;
     private JSONArray       jsonServers = null;
+    private JSONObject      jsonSettings = null;
 
 
 
                             config( File baseDirectory, String configFile ) {
         fileDir = baseDirectory;
         jsonConfigFile = configFile;
+
+        createEmpty();
     }
 
 
 
     public void             createTest(){
+        createEmpty();
+        configAddServer( "evilbrain.de");
+        configAddServer( "testserver.de" );
+    }
+
+    private boolean         createEmpty(){
 
         try {
             jsonConfig = new JSONObject();
             jsonServers = new JSONArray();
+            jsonSettings = new JSONObject();
+
             jsonConfig.put("servers", jsonServers);
+            jsonConfig.put("settings", jsonSettings);
         } catch (JSONException e) {
             e.printStackTrace();
+            errorMessage = e.getLocalizedMessage();
+            return false;
         }
 
-        configAddServer( "evilbrain.de");
-        configAddServer( "testserver.de" );
 
+        return true;
     }
 
-    public void             configRead(){
+    public boolean          configRead(){
 
         StringBuilder total = new StringBuilder();
 
@@ -69,6 +83,8 @@ public class config {
             configFileStream.close();
         } catch (Exception e) {
             e.printStackTrace();
+            errorMessage = e.getLocalizedMessage();
+            return false;
         }
 
     // Create new JSON-Object
@@ -82,11 +98,16 @@ public class config {
         // Create new JSON Object
             jsonConfig = new JSONObject( total.toString() );
             jsonServers = jsonConfig.getJSONArray("servers");
+            jsonSettings = jsonConfig.getJSONObject("settings");
 
         } catch (JSONException e) {
             e.printStackTrace();
+            errorMessage = e.getLocalizedMessage();
+            return false;
         }
 
+
+        return true;
     }
 
     public JSONObject       configAddServer( String name ){
@@ -130,7 +151,7 @@ public class config {
 
 
 
-    public void             configSave() {
+    public boolean          configSave() {
 
         String jsonString = jsonConfig.toString();
 
@@ -143,8 +164,12 @@ public class config {
             fos.flush();
             fos.close();
 
+
+
         } catch (Exception e) {
             e.printStackTrace();
+            errorMessage = e.getLocalizedMessage();
+            return false;
         }
 
     /*
@@ -156,7 +181,7 @@ public class config {
             Log.d("Files", "FileName:" + file[i].getName());
         }
     */
-
+        return true;
 
     }
 
