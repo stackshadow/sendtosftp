@@ -121,8 +121,7 @@ public class Main extends Activity {
         notificationInit();
         handlePushFromApp();
 
-
-
+        notificationSend( "Test", "This is a much longer text than notification can handle" );
 
 
 
@@ -150,18 +149,19 @@ public class Main extends Activity {
     }
     private void            notificationSend( String Title, String Text ){
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        // build notification
-        // the addAction re-use the same intent to keep the example short
-        Notification n = new Notification.Builder(this)
-                .setContentTitle( Title )
-                .setContentText( Text )
+        NotificationCompat.Builder notificationbuilder = new NotificationCompat.Builder(this);
+        Notification notification = notificationbuilder.setContentIntent(pIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pIntent)
-                .setAutoCancel(true).build();
+                .setTicker(Title)
+                .setWhen(0)
+                .setAutoCancel(true)
+                .setContentTitle(Title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(Text))
+                .setContentText(Text).build();
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(0, n);
+        notificationManager.notify(0, notification);
+
     }
 
     public void             openAddServerIntent(){
