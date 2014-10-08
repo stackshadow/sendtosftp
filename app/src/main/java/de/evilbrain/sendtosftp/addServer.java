@@ -84,8 +84,14 @@ public class addServer extends Activity {
                     }
                 });
 
+        buttonCancel.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+                        setResult(RESULT_OK,null);
+                        finish();
+                    }
+                });
 
-        ;
     }
 
     private String              collectData(){
