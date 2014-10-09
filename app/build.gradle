@@ -26,4 +26,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:20.0.0'
     compile files('libs/jsch-0.1.51.jar')
+    compile files('libs/commons-compress-1.8.1/commons-compress-1.8.1.jar')
 }
