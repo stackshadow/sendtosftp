@@ -118,12 +118,31 @@
         android:layout_alignLeft="@+id/serverName"
         android:inputType="textUri" />
 
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultserver"
+        android:id="@+id/defaultServer"
+        android:layout_below="@+id/keyFile"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/defaultserver_description"
+        android:id="@+id/defaultServerDescription"
+        android:layout_below="@+id/defaultServer"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/linearLayout"
-        android:layout_below="@+id/keyFile">
+        android:layout_below="@+id/defaultServerDescription">
 
         <Button
             android:layout_width="wrap_content"

@@ -10,4 +10,6 @@
     <string name="hostname">Hostname</string>
     <string name="serverlist">Serverlist</string>
     <string name="connection">Connection</string>
+    <string name="defaultserver">Default Server</string>
+    <string name="defaultserver_description">If this is active, this will be the server when you use the \"share\" function</string>
 </resources>

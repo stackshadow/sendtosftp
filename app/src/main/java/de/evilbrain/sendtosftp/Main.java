@@ -70,7 +70,8 @@ public class Main extends Activity {
     RadioGroup      serverList;
     Switch          connectionState;
     Button          buttonAddServer;
-    Button          bittonEditServer;
+    Button          buttonEditServer;
+    Button          buttonDeleteServer;
 
 
 // File stuff
@@ -96,7 +97,8 @@ public class Main extends Activity {
         serverList=(RadioGroup) findViewById(R.id.serverList);
         connectionState=(Switch) findViewById(R.id.connectionState);
         buttonAddServer=(Button) findViewById(R.id.buttonAddServer);
-        bittonEditServer=(Button) findViewById(R.id.bittonEditServer);
+        buttonEditServer=(Button) findViewById(R.id.buttonEditServer);
+        buttonDeleteServer=(Button) findViewById(R.id.buttonDeleteServer);
 
 
     // Other global vars
@@ -114,12 +116,7 @@ public class Main extends Activity {
         //conf.configSave();
 
     // Read configuration
-        if( ! conf.configRead() ) {
-            conf.configSave();
-            if( ! conf.configRead() ) {
-                notificationSend( "Error", conf.errorMessage );
-            }
-        }
+        conf.configRead();
 
     // Fill the serverlist
         serverListFill();
@@ -131,14 +128,20 @@ public class Main extends Activity {
     // Setup actions
         buttonAddServer.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
-                openServerAddIntent();
+                serverAdd();
             }
         });
-        bittonEditServer.setOnClickListener(new View.OnClickListener() {
+        buttonEditServer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                openServerEditIntent();
+                serverEdit();
             }
         });
+        buttonDeleteServer.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                serverDelete();
+            }
+        });
+
         connectionState.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
 
@@ -192,29 +195,41 @@ public class Main extends Activity {
         notificationID++;
     }
 
-    public void             openServerAddIntent(){
+    public void             serverAdd(){
 
         Intent intent = new Intent();
         intent.setClass( Main.this, addServer.class );
+        conf.putSettingsToIntent( intent );
 
         startActivityForResult(intent, 1);
     }
-    public void             openServerEditIntent(){
+    public void             serverEdit(){
 
     // Get selected server
         String server = serverListGetActive();
         if( server != null ) {
 
         // Set Intent with json-string
-            Intent intentServer = new Intent();
-            intentServer.setClass(Main.this, addServer.class);
-            conf.toIntent( intentServer, server );
+            Intent intent = new Intent();
+            intent.setClass(Main.this, addServer.class);
+            conf.putServerToIntent( intent, server );
+            conf.putSettingsToIntent( intent );
 
         // Start activity
-            startActivityForResult(intentServer, 1);
+            startActivityForResult(intent, 1);
 
         }
     }
+    public void             serverDelete(){
+        // Get selected server
+        String server = serverListGetActive();
+        if( server != null ) {
+            conf.deleteServer(server);
+        }
+
+        serverListFill();
+    }
+
     private void            connect(){
         String server = serverListGetActive();
         if( server != null ) {
@@ -282,26 +297,14 @@ public class Main extends Activity {
 
         if( data != null ) {
 
-        // Get jsonServer from intent
-            final Bundle extras = data.getExtras();
-            if( extras != null ) {
+            // Get and convert json from intent
+                JSONObject jsonServer = config.getServerFromIntent(data);
+                JSONObject jsonSettings = config.getSettingsFromIntent( data );
 
-                try {
+            // Add the server ( will be updated if already exist )
+                conf.addServer( jsonServer );
+                conf.setSettings( jsonSettings );
 
-                // Get and convert json from intent
-                    String jsonString = extras.getString("json");
-                    JSONObject jsonServer = new JSONObject(jsonString);
-
-                // Add the server ( will be updated if already exist )
-                    conf.addServer(jsonServer);
-
-                // Save config file
-                    conf.configSave();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         serverListFill();
@@ -312,24 +315,39 @@ public class Main extends Activity {
 // Widget Handling
     public void             serverListFill(){
 
+    // Vars
         JSONObject jsonServer = null;
-
-
-        serverList.removeAllViews();
         int index = 0;
+        String actualServer = null;
 
+    // clean list
+        serverList.removeAllViews();
+
+    // get the default server and select it
+        String defaultServer = conf.getDefaultServer();
+
+    // iterate through the server
         jsonServer = conf.getServer( index );
         while( jsonServer != null ){
+
+            actualServer = config.getServerName(jsonServer);
+
+        // Create radio button
             RadioButton RadioButton1  = new RadioButton(this);
-            RadioButton1.setText( config.getServerName(jsonServer) );
+            RadioButton1.setText( actualServer );
             RadioButton1.setId(index);
+        // This is the default server
+            if( defaultServer.equals(actualServer) ){
+                RadioButton1.setChecked( true );
+            }
+
+        // Add it
             serverList.addView(RadioButton1); //the RadioButtons are added to the radioGroup instead of the layout
 
             index++;
             jsonServer = conf.getServer( index );
         }
 
-        serverList.clearCheck();
         serverList.bringToFront();
 
 
@@ -378,7 +396,11 @@ public class Main extends Activity {
     protected void          onDestroy(){
 
     // Disconnect from ssh
-        sshConnection.disconnect();
+        if( sshConnection != null ) {
+            sshConnection.disconnect();
+        }
+
+        super.onDestroy();
     }
 
 }

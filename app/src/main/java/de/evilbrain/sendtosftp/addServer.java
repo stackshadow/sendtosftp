@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import org.json.JSONException;
@@ -39,6 +40,7 @@ public class addServer extends Activity {
     EditText userName;
     EditText userPassword;
     EditText keyFile;
+    CheckBox defaultServer;
 
     Button buttonOK;
     Button buttonCancel;
@@ -47,6 +49,7 @@ public class addServer extends Activity {
 
 // Server
     JSONObject jsonServer = null;
+    JSONObject jsonSettings = null;
 
     @Override
     protected void          onCreate(final Bundle savedInstanceState) {
@@ -61,24 +64,44 @@ public class addServer extends Activity {
         userName=(EditText) findViewById(R.id.userName);
         userPassword=(EditText) findViewById(R.id.userPassword);
         keyFile=(EditText) findViewById(R.id.keyFile);
+        defaultServer=(CheckBox)findViewById(R.id.defaultServer);
         buttonOK=(Button) findViewById(R.id.buttonOK);
         buttonCancel=(Button) findViewById(R.id.buttonCancel);
 
-    // Get jsonServer from intent
-        jsonServer = config.fromIntent( getIntent() );
+    // Get jsons from intent
+        jsonServer = config.getServerFromIntent(getIntent());
+        jsonSettings = config.getSettingsFromIntent( getIntent() );
 
-        serverName.setText( config.getServerName(jsonServer) );
+    // Set present values
+        String serverNameString = config.getServerName(jsonServer);
+        serverName.setText( serverNameString );
         serverHost.setText(config.getServerHostname(jsonServer));
         userName.setText( config.getServerUsername(jsonServer) );
         keyFile.setText( config.getServerKeyfile(jsonServer) );
 
+    // Compare if this is the default server
+        String defaultServerName = config.getDefaultServer(jsonSettings);
+        if( defaultServerName.equals(serverNameString) ){
+            defaultServer.setChecked( true );
+        } else {
+            defaultServer.setChecked( false );
+        }
 
-        // Actions
+
+    // Actions
         buttonOK.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
+
+                    // read data to jsons
+                        collectData();
+
+                    // Create and fill intent
                         Intent returnData = new Intent();
-                        returnData.putExtra("json", collectData() );
+                        config.putServerToIntent( returnData, jsonServer );
+                        config.putSettingsToIntent( returnData, jsonSettings );
+
+                    // return
                         setResult(RESULT_OK,returnData);
                         finish();
                     }
@@ -94,7 +117,7 @@ public class addServer extends Activity {
 
     }
 
-    private String              collectData(){
+    private void              collectData(){
         config.setServer( jsonServer,
                 serverName.getText().toString(),
                 serverHost.getText().toString(),
@@ -102,7 +125,11 @@ public class addServer extends Activity {
                 userPassword.getText().toString(),
                 keyFile.getText().toString() );
 
-        return jsonServer.toString();
+        if( defaultServer.isChecked() ){
+            config.setDefaultServer( jsonSettings, serverName.getText().toString() );
+        }
+
+        return;
     }
 
 

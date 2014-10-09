@@ -86,7 +86,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/serveredit"
-            android:id="@+id/bittonEditServer" />
+            android:id="@+id/buttonEditServer" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/serverdelete"
+            android:id="@+id/buttonDeleteServer" />
 
     </LinearLayout>
 

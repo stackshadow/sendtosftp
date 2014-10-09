@@ -114,7 +114,7 @@ public class config {
         return true;
     }
 
-    public boolean              configSave() {
+    private boolean             configSave() {
 
         String jsonString = jsonConfig.toString();
 
@@ -172,7 +172,7 @@ public class config {
         // Return
         return jsonServer;
     }
-    private int                 findServer( String name ){
+    private int                 getServerIndex( String name ){
 
         // Values
         int serverIndex = 0;
@@ -202,11 +202,14 @@ public class config {
 
         return -1;
     }
+    private JSONObject          getServer( String name ){
+        return getServer( getServerIndex(name) );
+    }
 
     public String               getServerString( String servername ){
 
         // Try to find a server
-        JSONObject jsonServer = getServer( findServer( servername ) );
+        JSONObject jsonServer = getServer( servername );
 
         if( jsonServer == null ){
             jsonServer = new JSONObject();
@@ -222,7 +225,7 @@ public class config {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
     public static String        getServerHostname( JSONObject jsonServer ){
         try {
@@ -231,7 +234,7 @@ public class config {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
     public static String        getServerUsername( JSONObject jsonServer ){
         try {
@@ -240,7 +243,7 @@ public class config {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
     public static String        getServerPassword( JSONObject jsonServer ){
         try {
@@ -249,7 +252,7 @@ public class config {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
     public static String        getServerKeyfile( JSONObject jsonServer ){
         try {
@@ -258,12 +261,30 @@ public class config {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
+    }
+
+// Settings
+    public String               getSettingsString(){
+        return jsonSettings.toString();
+    }
+    public String               getDefaultServer(){
+        return getDefaultServer( jsonSettings );
+    }
+    public static String        getDefaultServer( JSONObject jsonSettings ){
+        try {
+            return jsonSettings.getString("defaultServer");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 
-
 // ############################### Set ###############################
+// Every set option is saved into configuration file
+
     public static boolean       setServer( JSONObject jsonServer, String servername, String hostname, String username, String password, String keyfile ){
     // Basic check
         if( jsonServer == null ) return false;
@@ -277,34 +298,14 @@ public class config {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            return false;
         }
 
         return true;
     }
 
-    public boolean              addServer( String servername, String hostname, String username, String password, String keyfile ){
-    // Vars
-        JSONObject jsonServer = null;
-        JSONObject jsonServerFound = null;
-
-    // Find server
-        jsonServerFound = getServer( findServer( servername ) );
-        if( jsonServerFound == null ){
-
-        // Not found add a new one
-            jsonServer = new JSONObject();
-            jsonServers.put( jsonServer );
-
-        } else {
-            jsonServer = jsonServerFound;
-        }
-
-    // Set values
-        setServer( jsonServer, servername, hostname, username, password, keyfile );
-
-        return true;
-    }
     public boolean              addServer( JSONObject jsonServer ){
+
         return addServer(
                 getServerName(jsonServer),
                 getServerHostname(jsonServer),
@@ -313,9 +314,64 @@ public class config {
                 getServerKeyfile(jsonServer)
                 );
     }
+    public boolean              addServer( String servername, String hostname, String username, String password, String keyfile ){
+    // Vars
+        JSONObject jsonServer = null;
+        JSONObject jsonServerFound = null;
+        boolean result = false;
+
+    // Find server
+        jsonServerFound = getServer( servername );
+        if( jsonServerFound == null ){
+
+            // Not found add a new one
+            jsonServer = new JSONObject();
+            jsonServers.put( jsonServer );
+
+        } else {
+            jsonServer = jsonServerFound;
+        }
+
+    // Set values
+        result = setServer( jsonServer, servername, hostname, username, password, keyfile );
+        if( ! result ) return false;
+
+    // save to configuration file
+        result = configSave();
+        if( ! result ) return false;
+
+        return true;
+    }
+
+// Settings
+    public boolean              setDefaultServer( String defaultServer ){
+    // Vars
+        boolean result = false;
+
+        setDefaultServer( jsonSettings, defaultServer );
+
+    // save to configuration file
+        result = configSave();
+        if( ! result ) return false;
+
+    }
+    public static boolean       setDefaultServer( JSONObject jsonSettings, String defaultServer ){
+        try {
+            jsonSettings.put( "defaultServer" , defaultServer );
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean              setSettings( JSONObject jsonSettings ){
+        setDefaultServer( getDefaultServer(jsonSettings) );
+
+        return true;
+    }
 
 // ############################### Delete ###############################
-    public static JSONArray removeJSONArray( JSONArray jsonArray ,int pos ) {
+    public static JSONArray     removeJSONArray( JSONArray jsonArray ,int pos ) {
         if( pos > 0 ) return null;
 
         JSONArray jsonArrayNew = new JSONArray();
@@ -335,8 +391,8 @@ public class config {
         int jsonServerIndex = -1;
 
     // Find server
-        jsonServerIndex = findServer( servername );
-        if( jsonServers == null ){
+        jsonServerIndex = getServerIndex( servername );
+        if( jsonServers != null ){
             jsonServers = removeJSONArray( jsonServers, jsonServerIndex );
             return true;
         }
@@ -345,32 +401,54 @@ public class config {
     }
 
 // ############################### Intent ###############################
-    public void                 toIntent( Intent intentServer, String servername ){
-        intentServer.putExtra("json", getServerString(servername));
+    public static void          putServerToIntent( Intent intent, JSONObject jsonServer ){
+        intent.putExtra("jsonServer", jsonServer.toString() );
     }
-    public static JSONObject    fromIntent( Intent intentServer ) {
+    public void                 putServerToIntent( Intent intent, String servername ){
+        intent.putExtra("jsonServer", getServerString(servername));
+    }
 
+    public static void          putSettingsToIntent( Intent intent, JSONObject jsonSettings ){
+        intent.putExtra("jsonSettings", jsonSettings.toString() );
+    }
+    public void                 putSettingsToIntent( Intent intent ){
+        intent.putExtra("jsonSettings", getSettingsString());
+    }
+
+
+    private static JSONObject   getJsonFromIntent( Intent intent, String intentKey ){
         // Vars
-        JSONObject jsonServer = null;
+        JSONObject jsonObject = null;
 
         // get extras
-        final Bundle extras = intentServer.getExtras();
+        final Bundle extras = intent.getExtras();
         if (extras != null) {
 
             try {
-                String jsonString = extras.getString("json");
-                jsonServer = new JSONObject(jsonString);
+                String jsonString = extras.getString(intentKey);
+
+                if( jsonString == null ) jsonString = "{}";
+                jsonObject = new JSONObject(jsonString);
 
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                jsonObject = new JSONObject();
             }
 
         } else {
-            jsonServer = new JSONObject();
+            jsonObject = new JSONObject();
         }
 
-        return jsonServer;
+        return jsonObject;
     }
+    public static JSONObject    getServerFromIntent( Intent intent ) {
+        return getJsonFromIntent( intent, "jsonServer" );
+    }
+    public static JSONObject    getSettingsFromIntent( Intent intent ){
+        return getJsonFromIntent( intent, "jsonSettings" );
+    }
+
+
 
 }
