@@ -1,8 +1,25 @@
+/* SendToSFTP
+	Copyright (C) 2014 by Martin Langlotz
+
+	This file is part of the SendToSFTP app.
+
+	SendToSFTP is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, version 3 of the License
+
+	SendToSFTP is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with SendToSFTP.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package de.evilbrain.sendtosftp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.RadioButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,12 +33,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * Created by stackshadow on 07.10.14.
- */
 public class config {
 
     // Core
+    @SuppressWarnings("WeakerAccess")
     public String           errorMessage;
     private File            fileDir;
 
@@ -150,7 +165,7 @@ public class config {
 
 
 
-// ############################### Get ###############################
+// ############################### Get - Server ###############################
     public JSONObject           getServer( int index ){
         // Basic check
         if( jsonServers == null ) return null;
@@ -185,7 +200,7 @@ public class config {
                 if( serverIndex < jsonServers.length() ) {
 
                     jsonServer = jsonServers.getJSONObject(serverIndex);
-                    String ServerName = this.getServerName(jsonServer);
+                    String ServerName = getServerName(jsonServer);
                     if( ServerName.equals(name) ){
                         return serverIndex;
                     }
@@ -264,7 +279,7 @@ public class config {
         return "";
     }
 
-// Settings
+// ############################### Get - Settings ###############################
     public String               getSettingsString(){
         return jsonSettings.toString();
     }
@@ -282,8 +297,10 @@ public class config {
     }
 
 
-// ############################### Set ###############################
-// Every set option is saved into configuration file
+
+
+
+// ############################### Set - Server ###############################
 
     public static boolean       setServer( JSONObject jsonServer, String servername, String hostname, String username, String password, String keyfile ){
     // Basic check
@@ -343,7 +360,7 @@ public class config {
         return true;
     }
 
-// Settings
+// ############################### Set - Settings ###############################
     public boolean              setDefaultServer( String defaultServer ){
     // Vars
         boolean result = false;
@@ -354,6 +371,7 @@ public class config {
         result = configSave();
         if( ! result ) return false;
 
+        return true;
     }
     public static boolean       setDefaultServer( JSONObject jsonSettings, String defaultServer ){
         try {
@@ -370,6 +388,10 @@ public class config {
         return true;
     }
 
+
+
+
+
 // ############################### Delete ###############################
     public static JSONArray     removeJSONArray( JSONArray jsonArray ,int pos ) {
         if( pos > 0 ) return null;
@@ -385,7 +407,6 @@ public class config {
         }
         return jsonArrayNew;
     }
-
     public boolean              deleteServer( String servername ){
     // Vars
         int jsonServerIndex = -1;
@@ -399,6 +420,10 @@ public class config {
 
         return false;
     }
+
+
+
+
 
 // ############################### Intent ###############################
     public static void          putServerToIntent( Intent intent, JSONObject jsonServer ){

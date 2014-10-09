@@ -21,37 +21,67 @@
 
     ]]>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/serverlist"
+        android:id="@+id/serverNameText" />
+
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:id="@+id/linearLayout2"
-        android:layout_above="@+id/connectionState">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/serverlist"
-            android:id="@+id/serverNameText" />
+        android:id="@+id/scrollView"
+        android:layout_above="@+id/fileNameText"
+        android:layout_below="@+id/serverNameText"
+        android:fillViewport="false">
 
         <RadioGroup
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_toEndOf="@+id/imagePreview"
-            android:layout_below="@+id/serverNameText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="false"
             android:id="@+id/serverList"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentBottom="false"
             android:gravity="top"
-            android:showDividers="beginning">
+            android:showDividers="beginning"
+            android:layout_above="@+id/fileNameText">
 
         </RadioGroup>
+    </ScrollView>
 
-    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/filename"
+        android:id="@+id/fileNameText"
+        android:layout_above="@+id/fileName"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/fileName"
+        android:layout_above="@+id/imagePreview"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/imagePreview"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="false"
+        android:layout_above="@+id/buttonSend"
+        android:layout_alignParentLeft="false"
+        android:contentDescription="@string/imagepreview" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/send"
+        android:id="@+id/buttonSend"
+        android:layout_above="@+id/connectionState"
+        android:visibility="invisible" />
 
     <Switch
         android:layout_width="wrap_content"
@@ -95,12 +125,5 @@
             android:id="@+id/buttonDeleteServer" />
 
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imagePreview"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

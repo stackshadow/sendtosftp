@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="addServer">Add Server</string>
-    <string name="save">Save</string>
-    <string name="a">a</string>
-    <string name="testconnection">Test Connection</string>
-    <string name="addserver">Add Server</string>
     <string name="ok">ok</string>
     <string name="cancel">Cancel</string>
     <string name="serveredit">Edit</string>
     <string name="serveradd">Add</string>
     <string name="serverdelete">Delete</string>
+    <string name="send">Send</string>
 </resources>

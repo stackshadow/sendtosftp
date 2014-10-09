@@ -18,18 +18,15 @@
 
 package de.evilbrain.sendtosftp;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Properties;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.TaskStackBuilder;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -37,20 +34,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
-
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,19 +49,21 @@ import org.json.JSONObject;
 public class Main extends Activity {
 
 
-    ProgressDialog mProgressDialog;
+    private ProgressDialog mProgressDialog;
 
 // Configuration
-    config          conf;
+    private config          conf;
 
 // Widgets
-    TextView        fileToSend;
-    ImageView       imagePreview;
-    RadioGroup      serverList;
-    Switch          connectionState;
-    Button          buttonAddServer;
-    Button          buttonEditServer;
-    Button          buttonDeleteServer;
+    private RadioGroup      serverList;
+    private TextView        fileNameText;
+    private TextView        fileName;
+    private ImageView       imagePreview;
+    private Button          buttonSend;
+    private Switch          connectionState;
+    private Button          buttonAddServer;
+    private Button          buttonEditServer;
+    private Button          buttonDeleteServer;
 
 
 // File stuff
@@ -92,9 +84,11 @@ public class Main extends Activity {
         setContentView(R.layout.activity_main);
 
     // Get Widgets
-        fileToSend=(TextView) findViewById(R.id.serverNameText);
-        imagePreview=(ImageView) findViewById(R.id.imagePreview);
         serverList=(RadioGroup) findViewById(R.id.serverList);
+        fileNameText=(TextView) findViewById(R.id.fileNameText);
+        fileName=(TextView) findViewById(R.id.fileName);
+        imagePreview=(ImageView) findViewById(R.id.imagePreview);
+        buttonSend=(Button) findViewById(R.id.buttonSend);
         connectionState=(Switch) findViewById(R.id.connectionState);
         buttonAddServer=(Button) findViewById(R.id.buttonAddServer);
         buttonEditServer=(Button) findViewById(R.id.buttonEditServer);
@@ -158,6 +152,7 @@ public class Main extends Activity {
     }
 
 // Activity Handling
+    @SuppressLint("NewApi")
     private void            handlePushFromApp(){
         // Push to this app
         Intent intent = getIntent();
@@ -165,12 +160,30 @@ public class Main extends Activity {
 
         if ( type != null ) {
 
-            // Text file
-            fileToSend.setText( intent.getClipData().getItemAt(0).getUri().toString() );
+        // Set all visible
+            fileNameText.setVisibility(View.VISIBLE );
+            fileName.setVisibility(View.VISIBLE);
+            imagePreview.setVisibility(View.VISIBLE);
+            buttonSend.setVisibility(View.VISIBLE);
 
-            // Preview Image
+        // get Content
+            String contentString = "";
+            Object content = null;
+
+            if( android.os.Build.VERSION.SDK_INT > 16 ){
+                content = intent.getClipData().getItemAt(0).getUri();
+                contentString = content.toString();
+            } else {
+                content = intent.getExtras().get(Intent.EXTRA_STREAM);
+                contentString = content.toString();
+            }
+
+        // set filename
+            fileName.setText( contentString );
+
+        // Preview Image
             if( type.contains("image")  ){
-                imagePreview.setImageURI((Uri) intent.getExtras().get(Intent.EXTRA_STREAM));
+                imagePreview.setImageURI((Uri) content );
             }
         }
     }

@@ -21,35 +21,31 @@ package de.evilbrain.sendtosftp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
 public class addServer extends Activity {
 
     // Widgets
-    EditText serverName;
-    EditText serverHost;
-    EditText userName;
-    EditText userPassword;
-    EditText keyFile;
-    CheckBox defaultServer;
+    private EditText serverName;
+    private EditText serverHost;
+    private EditText userName;
+    private EditText userPassword;
+    private EditText keyFile;
+    private CheckBox defaultServer;
 
-    Button buttonOK;
-    Button buttonCancel;
+    private Button buttonOK;
+    private Button buttonCancel;
 
-    String action;
 
 // Server
-    JSONObject jsonServer = null;
-    JSONObject jsonSettings = null;
+    private JSONObject jsonServer = null;
+    private JSONObject jsonSettings = null;
 
     @Override
     protected void          onCreate(final Bundle savedInstanceState) {

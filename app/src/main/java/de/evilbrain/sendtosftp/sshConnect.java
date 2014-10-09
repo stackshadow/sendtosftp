@@ -4,7 +4,6 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UserInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
@@ -23,8 +22,8 @@ public class sshConnect {
     public String       errorMessage;
 
 // JSch
-    JSch                jsch = null;
-    Session             jschSession = null;
+    private JSch        jsch = null;
+    private Session     jschSession = null;
 
     public void         setHost( String hostName ){
         serverHostName = hostName;
@@ -71,11 +70,7 @@ public class sshConnect {
             jschSession.connect();
 
         // Check if connect
-            if( jschSession.isConnected() ){
-                serverIsConnected = true;
-            } else {
-                serverIsConnected = false;
-            }
+            serverIsConnected = jschSession.isConnected();
 
         } catch (JSchException e) {
             e.printStackTrace();

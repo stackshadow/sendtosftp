@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="save">Speichern</string>
-    <string name="testconnection">Verbindung testen</string>
-    <string name="addserver">Server hinzufügen</string>
     <string name="ok">Übernehmen</string>
     <string name="cancel">Abbrechen</string>
     <string name="serveredit">Bearbeiten</string>
     <string name="serveradd">Hinzufügen</string>
     <string name="serverdelete">Löschen</string>
+    <string name="send">Send</string>
 </resources>
